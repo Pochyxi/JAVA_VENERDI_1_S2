@@ -16,15 +16,6 @@ public class Archivio {
     String databaseString;
     ArrayList<Catalogo> database;
 
-    public Archivio() {
-        try {
-            this.leggi();
-        } catch( IOException e ) {
-            System.out.println( "Qualcosa è andato storto" );
-        }
-
-    }
-
     private Genere determinaGenere( String str ) {
         switch (str) {
             case "FANTASY":
@@ -56,6 +47,14 @@ public class Archivio {
     }
 
     public void getDatabases() {
+        if (database == null) {
+            try {
+                this.leggi();
+            } catch( IOException e ) {
+                System.out.println( "Qualcosa è andato storto" );
+            }
+        }
+
 
         for( int i = 0; i < database.size(); i++ ) {
             System.out.println(database.get(i));
@@ -110,12 +109,12 @@ public class Archivio {
 
         if( item instanceof Libro ) {
             String oggettoStringato =
-                    " " + item.getTitolo()
-                            + " " + item.getAnnoPubblicazione()
-                            + " " + item.getNumeroPagine()
-                            + " " + (( Libro ) item).getAutore()
-                            + " " + (( Libro ) item).getGenere()
-                            + " " + "LIBRO"
+                    "" + item.getTitolo()
+                            + "-" + item.getAnnoPubblicazione()
+                            + "-" + item.getNumeroPagine()
+                            + "-" + (( Libro ) item).getAutore()
+                            + "-" + (( Libro ) item).getGenere()
+                            + "-" + "LIBRO"
                             + "/";
 
             try {
@@ -126,11 +125,11 @@ public class Archivio {
 
         } else {
             String oggettoStringato =
-                    " " + item.getTitolo()
-                            + " " + item.getAnnoPubblicazione()
-                            + " " + item.getNumeroPagine()
-                            + " " + (( Rivista ) item).getPeriodicita()
-                            + " " + "RIVISTA"
+                    "" + item.getTitolo()
+                            + "-" + item.getAnnoPubblicazione()
+                            + "-" + item.getNumeroPagine()
+                            + "-" + (( Rivista ) item).getPeriodicita()
+                            + "-" + "RIVISTA"
                             + "/";
 
             try {
@@ -151,33 +150,28 @@ public class Archivio {
         if( database.exists() ) {
             try {
                 // creo il file
-                String dataContent = FileUtils.readFileToString( database, encoding );
-                System.out.println( "il contenuto del file è " + dataContent );
-                this.databaseString = dataContent;
+                this.databaseString = FileUtils.readFileToString( database, encoding );
 
                 String[] arr = this.databaseString.split( "/" );
-
-
 
                 ArrayList<Catalogo> catalogoList = new ArrayList<>();
 
                 for( int i = 0 ; i < arr.length ; i++ ) {
-                    String[] stringaSplit = arr[ i ].split( " " );
-
+                    String[] stringaSplit = arr[ i ].split( "-" );
 
                     for( int j = 0 ; j < stringaSplit.length ; j++ ) {
 
-                        if( stringaSplit.length == 7 ) {
-                            Catalogo obj = new Libro( stringaSplit[ 1 ], Integer.parseInt( stringaSplit[ 2 ] ),
-                                    Integer.parseInt( stringaSplit[ 3 ] ),
-                                    stringaSplit[ 4 ], determinaGenere( stringaSplit[5] ) );
+                        if( stringaSplit.length == 6 ) {
+                            Catalogo obj = new Libro( stringaSplit[ 0 ], Integer.parseInt( stringaSplit[ 1 ] ),
+                                    Integer.parseInt( stringaSplit[ 2 ] ),
+                                    stringaSplit[ 3 ], determinaGenere( stringaSplit[4] ) );
                             if (j == stringaSplit.length - 1) {
                                 catalogoList.add( obj );
                             }
-                        } else if( stringaSplit.length == 6 ) {
-                            Catalogo obj = new Rivista( stringaSplit[ 1 ], Integer.parseInt( stringaSplit[ 2 ] ),
-                                    Integer.parseInt( stringaSplit[ 3 ] )
-                                    , determinaPeriodicita( stringaSplit[4] ) );
+                        } else if( stringaSplit.length == 5 ) {
+                            Catalogo obj = new Rivista( stringaSplit[ 0 ], Integer.parseInt( stringaSplit[ 1 ] ),
+                                    Integer.parseInt( stringaSplit[ 2 ] )
+                                    , determinaPeriodicita( stringaSplit[3] ) );
                             if (j == stringaSplit.length - 1) {
                                 catalogoList.add( obj );
                             }
@@ -198,6 +192,13 @@ public class Archivio {
     }
 
     public void rimuovi(int isbn) {
+
+        try {
+            this.leggi();
+        } catch( IOException e ) {
+            throw new RuntimeException( e );
+        }
+
         ArrayList<Catalogo> arrLess = new ArrayList<>();
         boolean controllo = false;
 
@@ -214,8 +215,6 @@ public class Archivio {
                 }
             }
 
-            System.out.println(arrLess);
-
             String text = "";
             File database = new File( "docs/database.txt" );
             String encoding = "UTF-8";
@@ -226,9 +225,12 @@ public class Archivio {
                 throw new RuntimeException( e );
             }
 
+
+
             for ( int i = 0; i < arrLess.size(); i++ ) {
                 this.scrivi( arrLess.get( i ) );
             }
+            this.database = arrLess;
 
         } else {
             System.out.println( "L'elemento non esiste" );
