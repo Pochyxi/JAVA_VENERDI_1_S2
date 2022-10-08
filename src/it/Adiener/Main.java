@@ -3,33 +3,38 @@ package it.Adiener;
 import Classi.Archivio;
 import Classi.Catalogo;
 import Classi.Libro;
-import Classi.Rivista;
-import InterfacesAndEnums.Genere;
-import InterfacesAndEnums.Periodicita;
 
-import java.util.Scanner;
-import java.util.stream.Stream;
+import InterfacesAndEnums.Genere;
+
+
+import java.io.IOException;
+
+
 
 public class Main {
     public static void main( String[] args ) {
-        Catalogo libro1 = new Libro( "ciao a tutti", 2022, 200, "BUDKA", Genere.COMMEDIA );
-        Catalogo rivista1 = new Rivista( "Pirati dei mari", 2022, 560, Periodicita.SETTIMANALE );
-        Catalogo libro2 = new Libro( "Mamma mia", 2000, 800, "BUDKA", Genere.HORROR );
-        Catalogo rivista2 = new Rivista( "volo", 2022, 560, Periodicita.SETTIMANALE );
+        Catalogo libro = new Libro(1, "Quinto", 1957, 1300, "A.D.L.V", Genere.AZIONE );
 
         Archivio archivio = new Archivio();
 
-//        archivio.scrivi( libro2 );
-//        archivio.rimuovi( 1014 );
+//        archivio.scrivi( libro );
+//        archivio.rimuovi( 4 );
 
         archivio.getDatabases();
 
+
+
+
+
+
+
+
 //        System.out.println( "___________" );
-//        System.out.println( archivio.filtraPerISBN( 1015 ) );
-//        System.out.println( archivio.filtraPerAnno( 2010 ) );
+//        System.out.println( archivio.filtraPerISBN( 2 ) );
+//        System.out.println( archivio.filtraPerAnno( 1957 ) );
 //
 //        System.out.println( "___________" );
-//        System.out.println( archivio.filtraPerAutore( "BUDKA" ) );
+//        System.out.println( archivio.filtraPerAutore( "A.D.L.V" ) );
 
 
     }

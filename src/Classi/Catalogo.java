@@ -1,19 +1,19 @@
 package Classi;
 
 public abstract class Catalogo {
-
-    private static int counter = 1000;
     private int codiceISBN;
     private String titolo;
     private int annoPubblicazione;
 
     private int numeroPagine;
 
-    public Catalogo( String titolo, int annoPubblicazione, int numeroPagine ){
-        this.setTitolo( titolo );
+    public Catalogo(int codice, String titolo, int annoPubblicazione, int numeroPagine ){
+        this.codiceISBN = codice;
+        this.titolo = titolo;
+        this.annoPubblicazione = annoPubblicazione;
+        this.numeroPagine = numeroPagine;setTitolo( titolo );
         this.setAnnoPubblicazione( annoPubblicazione);
         this.setNumeroPagine( numeroPagine );
-        setCodiceISBN();
     }
 
 
@@ -29,10 +29,6 @@ public abstract class Catalogo {
 
     public void setNumeroPagine( int numeroPagine ) {
         this.numeroPagine = numeroPagine;
-    }
-
-    private void setCodiceISBN() {
-        this.codiceISBN = this.counter++;
     }
 
     // GETTERS

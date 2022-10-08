@@ -7,86 +7,70 @@ import org.apache.commons.io.FileUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Stream;
-
 
 public class Archivio {
     String databaseString;
     ArrayList<Catalogo> database;
 
-    private Genere determinaGenere( String str ) {
-        switch (str) {
-            case "FANTASY":
-                return Genere.FANTASY;
-            case "COMMEDIA":
-                return Genere.COMMEDIA;
-            case "HORROR":
-                return Genere.HORROR;
-            case "AZIONE":
-                return Genere.AZIONE;
-            case "ROMANZI":
-                return Genere.ROMANZI;
-            default:
-                return Genere.FANTASY;
+    public Archivio( ) {
+        try {
+            this.database = this.leggi();
+        } catch( IOException e ) {
+            throw new RuntimeException( e );
         }
+    }
+
+    private Genere determinaGenere( String str ) {
+        return switch (str) {
+            case "FANTASY" -> Genere.FANTASY;
+            case "COMMEDIA" -> Genere.COMMEDIA;
+            case "HORROR" -> Genere.HORROR;
+            case "AZIONE" -> Genere.AZIONE;
+            case "ROMANZI" -> Genere.ROMANZI;
+            default -> Genere.FANTASY;
+        };
     }
 
     private Periodicita determinaPeriodicita( String str ) {
-        switch (str) {
-            case "SETTIMANALE":
-                return Periodicita.SETTIMANALE;
-            case "MENSILE":
-                return Periodicita.MENSILE;
-            case "SEMESTRALE":
-                return Periodicita.SEMESTRALE;
-            default:
-                return Periodicita.SETTIMANALE;
-        }
+        return switch (str) {
+            case "SETTIMANALE" -> Periodicita.SETTIMANALE;
+            case "MENSILE" -> Periodicita.MENSILE;
+            case "SEMESTRALE" -> Periodicita.SEMESTRALE;
+            default -> Periodicita.SETTIMANALE;
+        };
     }
 
     public void getDatabases() {
-        if (database == null) {
-            try {
-                this.leggi();
-            } catch( IOException e ) {
-                System.out.println( "Qualcosa è andato storto" );
-            }
-        }
 
-
-        for( int i = 0; i < database.size(); i++ ) {
-            System.out.println(database.get(i));
+        for( Catalogo catalogo : database ) {
+            System.out.println( catalogo );
         }
         System.out.println("Ci sono " + database.size() + " elementi nel catalogo");
     }
 
-    // questo metodo dovrà ritornare un oggetto di tipo Libro/Rivista dalla lista del catalogo tramite isbn
     public Catalogo filtraPerISBN( int codiceIsbn ) {
 
-        for( int i = 0; i < database.size(); i++ ) {
-            if( database.get(i).getCodiceISBN() == codiceIsbn ) {
-                return database.get(i);
+        for( Catalogo catalogo : database ) {
+            if( catalogo.getCodiceISBN() == codiceIsbn ) {
+                return catalogo;
             }
         }
         return null;
     }
 
-    // questo metodo dovrà ritornare una lista di oggetti di tipo Catalogo filtrati per anno
     public List<Catalogo> filtraPerAnno( int anno ) {
 
-        List<Catalogo> lista = new ArrayList<Catalogo>();
+        List<Catalogo> lista = new ArrayList<>();
 
-        for( int i = 0; i < database.size(); i++ ) {
-            if( database.get(i).getAnnoPubblicazione() == anno ) {
-               lista.add(database.get(i));
+        for( Catalogo catalogo : database ) {
+            if( catalogo.getAnnoPubblicazione() == anno ) {
+                lista.add( catalogo );
             }
         }
         return lista;
     }
 
-    // questo metodo dovrà ritornare una lista di oggetti di tipo Catalogo filtrati per autore
     public List<Libro> filtraPerAutore( String autore ) {
 
         List<Libro> lista = new ArrayList<>();
@@ -95,12 +79,21 @@ public class Archivio {
                 .filter( e -> e instanceof Libro )
                 .forEach( e -> lista.add((Libro)e) );
 
-        for( int i = 0; i < lista.size(); i++ ) {
-            if( lista.get(i).getAutore().equals( autore ) ) {
-                listaFiltrata.add(lista.get(i));
+        for( Libro libro : lista ) {
+            if( libro.getAutore().equals( autore ) ) {
+                listaFiltrata.add( libro );
             }
         }
         return listaFiltrata;
+    }
+
+    public int determinaISBN() {
+        try {
+            if( this.leggi().size() == 0 ) { return 1; }
+           return this.leggi().get( leggi().size() - 1 ).getCodiceISBN();
+        } catch( IOException e ) {
+            throw new RuntimeException( e );
+        }
     }
 
     public void scrivi( Catalogo item ) {
@@ -109,7 +102,8 @@ public class Archivio {
 
         if( item instanceof Libro ) {
             String oggettoStringato =
-                    "" + item.getTitolo()
+                    "" + (this.determinaISBN() + 1)
+                            + "-" + item.getTitolo()
                             + "-" + item.getAnnoPubblicazione()
                             + "-" + item.getNumeroPagine()
                             + "-" + (( Libro ) item).getAutore()
@@ -119,13 +113,15 @@ public class Archivio {
 
             try {
                 FileUtils.writeStringToFile( database, oggettoStringato, encoding, true );
+                this.database = this.leggi();
             } catch( IOException e ) {
                 throw new RuntimeException( e );
             }
 
         } else {
             String oggettoStringato =
-                    "" + item.getTitolo()
+                    "" + this.determinaISBN() + 1
+                            + "-" + item.getTitolo()
                             + "-" + item.getAnnoPubblicazione()
                             + "-" + item.getNumeroPagine()
                             + "-" + (( Rivista ) item).getPeriodicita()
@@ -134,6 +130,7 @@ public class Archivio {
 
             try {
                 FileUtils.writeStringToFile( database, oggettoStringato, encoding, true );
+                this.database = this.leggi();
             } catch( IOException e ) {
                 throw new RuntimeException( e );
             }
@@ -141,46 +138,45 @@ public class Archivio {
         }
     }
 
-    public void leggi() throws IOException {
+    public ArrayList<Catalogo> leggi() throws IOException {
 
         File database = new File( "docs/database.txt" );
         String encoding = "UTF-8";
-
+        ArrayList<Catalogo> catalogoList = new ArrayList<>();
 
         if( database.exists() ) {
             try {
                 // creo il file
                 this.databaseString = FileUtils.readFileToString( database, encoding );
 
-                String[] arr = this.databaseString.split( "/" );
+                String[] arrOfItems = this.databaseString.split( "/" );
 
-                ArrayList<Catalogo> catalogoList = new ArrayList<>();
-
-                for( int i = 0 ; i < arr.length ; i++ ) {
-                    String[] stringaSplit = arr[ i ].split( "-" );
+                for( String arrOfItem : arrOfItems ) {
+                    String[] stringaSplit = arrOfItem.split( "-" );
 
                     for( int j = 0 ; j < stringaSplit.length ; j++ ) {
 
-                        if( stringaSplit.length == 6 ) {
-                            Catalogo obj = new Libro( stringaSplit[ 0 ], Integer.parseInt( stringaSplit[ 1 ] ),
+                        if( stringaSplit.length == 7 ) {
+                            Catalogo obj = new Libro(
+                                    Integer.parseInt( stringaSplit[ 0 ] ), stringaSplit[ 1 ],
                                     Integer.parseInt( stringaSplit[ 2 ] ),
-                                    stringaSplit[ 3 ], determinaGenere( stringaSplit[4] ) );
-                            if (j == stringaSplit.length - 1) {
+                                    Integer.parseInt( stringaSplit[ 3 ] ),
+                                    stringaSplit[ 4 ],
+                                    determinaGenere( stringaSplit[ 5 ] ) );
+                            if( j == stringaSplit.length - 1 ) {
                                 catalogoList.add( obj );
                             }
-                        } else if( stringaSplit.length == 5 ) {
-                            Catalogo obj = new Rivista( stringaSplit[ 0 ], Integer.parseInt( stringaSplit[ 1 ] ),
-                                    Integer.parseInt( stringaSplit[ 2 ] )
-                                    , determinaPeriodicita( stringaSplit[3] ) );
-                            if (j == stringaSplit.length - 1) {
+                        } else if( stringaSplit.length == 6 ) {
+                            Catalogo obj = new Rivista( Integer.parseInt( stringaSplit[ 0 ] ), stringaSplit[ 1 ],
+                                    Integer.parseInt( stringaSplit[ 2 ] ),
+                                    Integer.parseInt( stringaSplit[ 3 ] )
+                                    , determinaPeriodicita( stringaSplit[ 4 ] ) );
+                            if( j == stringaSplit.length - 1 ) {
                                 catalogoList.add( obj );
                             }
                         }
                     }
-                    this.database = catalogoList;
                 }
-
-
             } catch( IOException e ) {
                 System.out.println( "Qualcosa è andato storto nel recupero delle risorse" );
             }
@@ -189,29 +185,34 @@ public class Archivio {
             System.out.println( "il file  non esiste!" );
             FileUtils.writeStringToFile( database, text, encoding );
         }
+        return catalogoList;
     }
 
     public void rimuovi(int isbn) {
 
         try {
-            this.leggi();
+            this.database = leggi();
         } catch( IOException e ) {
             throw new RuntimeException( e );
         }
 
-        ArrayList<Catalogo> arrLess = new ArrayList<>();
+        ArrayList<Catalogo> arraySenzaElemento = new ArrayList<>();
+
         boolean controllo = false;
 
-        for( int i = 0 ; i < this.database.size() ; i++ ) {
-            if( this.database.get( i ).getCodiceISBN() == isbn ) {
+        for( Catalogo item : this.database ) {
+            if( item.getCodiceISBN() == isbn ) {
                 controllo = true;
+                break;
             }
         }
 
+        System.out.println(controllo);
+
         if( controllo ) {
-            for ( int i = 0; i < this.database.size(); i++ ) {
-                if ( this.database.get( i ).getCodiceISBN() != isbn ) {
-                    arrLess.add( this.database.get( i ));
+            for( Catalogo value : this.database ) {
+                if( value.getCodiceISBN() != isbn ) {
+                    arraySenzaElemento.add( value );
                 }
             }
 
@@ -225,18 +226,19 @@ public class Archivio {
                 throw new RuntimeException( e );
             }
 
-
-
-            for ( int i = 0; i < arrLess.size(); i++ ) {
-                this.scrivi( arrLess.get( i ) );
+            for( Catalogo catalogo : arraySenzaElemento ) {
+                this.scrivi( catalogo );
             }
-            this.database = arrLess;
+
+            try {
+                this.database = leggi();
+            } catch( IOException e ) {
+                throw new RuntimeException( e );
+            }
 
         } else {
             System.out.println( "L'elemento non esiste" );
         }
-
-
 
     }
 }
