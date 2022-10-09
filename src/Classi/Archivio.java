@@ -165,7 +165,7 @@ public class Archivio {
             }
         } else {
             String text = "";
-            System.out.println( "il file  non esiste!" );
+            System.out.println( "il file  non esiste! File creato per la prima volta, riavvia il programma!" );
             FileUtils.writeStringToFile( database, text, encoding );
         }
         return catalogoList;
@@ -319,7 +319,6 @@ public class Archivio {
 
             System.out.println( "ELIMINA ELEMENTO DAL CATALOGO TRAMITE CODICE ISBN" );
             System.out.println( "Inserisci il codice ISBN per eliminare, 0 per uscire" );
-
 
             try {
                 int codice = scanner.nextInt();
