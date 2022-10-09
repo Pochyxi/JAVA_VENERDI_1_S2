@@ -13,8 +13,8 @@ public class Libro extends Catalogo{
     }
     public Libro (String titolo, int annoPubblicazione, int numeroPagine, String autore, Genere genere) {
         super(titolo, annoPubblicazione, numeroPagine );
-        this.autore = autore;
-        this.genere = genere;
+        this.setAutore( autore );
+        this.setGenere( genere );
     }
 
     @Override

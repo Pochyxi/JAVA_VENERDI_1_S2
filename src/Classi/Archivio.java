@@ -26,7 +26,6 @@ public class Archivio {
     //////////////////////////////// METODI PRIVATI //////////////////////////////////
     private Genere determinaGenere( String str ) {
         return switch (str) {
-            case "FANTASY" -> Genere.FANTASY;
             case "COMMEDIA" -> Genere.COMMEDIA;
             case "HORROR" -> Genere.HORROR;
             case "AZIONE" -> Genere.AZIONE;
@@ -37,7 +36,6 @@ public class Archivio {
 
     private Periodicita determinaPeriodicita( String str ) {
         return switch (str) {
-            case "SETTIMANALE" -> Periodicita.SETTIMANALE;
             case "MENSILE" -> Periodicita.MENSILE;
             case "SEMESTRALE" -> Periodicita.SEMESTRALE;
             default -> Periodicita.SETTIMANALE;
@@ -55,14 +53,11 @@ public class Archivio {
         }
     } // DETERMINA IN FASE DI CREAZIONE IL CODICE UNIVOCO DI OGNI ELEMENTO DEL CATALOGO
 
-    //////////////////////////////// METODI ACCESSIBILI //////////////////////////////////
-    public void getDatabases() { // RITORNA UN ARRAY DI OGGETTI DI CLASSE CATALOGO COLLEGATO AL DATABASE
+    private void getDatabases() { // RITORNA UN ARRAY DI OGGETTI DI CLASSE CATALOGO COLLEGATO AL DATABASE
 
         for( Catalogo catalogo : database ) {
             StringBuilder linea = new StringBuilder( "-" );
-            for( int i = 0 ; i < catalogo.toString().length() ; i++ ) {
-                linea.append( "-" );
-            }
+            linea.append( "-".repeat( catalogo.toString().length() ) );
 
             System.out.println( linea );
             System.out.println( catalogo );
@@ -74,26 +69,26 @@ public class Archivio {
         System.out.println();
     }
 
-    public List<Catalogo> filtraPerISBN( int codiceIsbn ) { // RITORNA UN OGGETTO DI TIPO CATALOGO CHE HA QUEL ISBN
+    private List<Catalogo> filtraPerISBN( int codiceIsbn ) { // RITORNA UN OGGETTO DI TIPO CATALOGO CHE HA QUEL ISBN
         return this.database.stream()
                 .filter( item -> item.getCodiceISBN() == codiceIsbn )
                 .toList();
     }
 
-    public List<Catalogo> filtraPerAnno( int anno ) { // RITORNA UN ARRAY DI OGGETTI DI CLASSE CATALOGO CHE
+    private List<Catalogo> filtraPerAnno( int anno ) { // RITORNA UN ARRAY DI OGGETTI DI CLASSE CATALOGO CHE
         return database.stream()                      // CORRISPONDONO ALL'ANNO
                 .filter( item -> item.getAnnoPubblicazione() == anno )
                 .collect( Collectors.toList() );
     }
 
-    public List<Catalogo> filtraPerAutore( String autore ) {  // RITORNA UN ARRAY DI OGGETTI DI CLASSE CATALOGO CHE
+    private List<Catalogo> filtraPerAutore( String autore ) {  // RITORNA UN ARRAY DI OGGETTI DI CLASSE CATALOGO CHE
         return database.stream()                              // CORRISPONDONO ALL'AUTORE
                 .filter( e -> e instanceof Libro )
                 .filter( e -> (( Libro ) e).getAutore().equals( autore ) )
                 .collect( Collectors.toList() );
     }
 
-    public void scrivi( Catalogo item ) {  // SERVE PER SCRIVERE UN NUOVO ITEM NEL DATABASE
+    private void scrivi( Catalogo item ) {  // SERVE PER SCRIVERE UN NUOVO ITEM NEL DATABASE
         File database = new File( "docs/database.txt" );
         String encoding = "UTF-8";
 
@@ -123,7 +118,7 @@ public class Archivio {
         }
     }
 
-    public ArrayList<Catalogo> leggi() throws IOException {
+    private ArrayList<Catalogo> leggi() throws IOException {
 
         File database = new File( "docs/database.txt" );
         String encoding = "UTF-8";
@@ -177,7 +172,7 @@ public class Archivio {
     } // ELABORA IL CONTENUTO DEL DATABASE, RITORNA UN ARRAY
 
     // DI OGGETTI DI CLASSE CATALOGO
-    public void rimuovi( int isbn ) {
+    private void rimuovi( int isbn ) {
 
         try {
             this.database = leggi();
@@ -235,7 +230,7 @@ public class Archivio {
 
     } // RIMUOVE DAL DATABASE L'ITEM CHE CONTIENE QUEL CODICE ISBN
 
-    public void modaleNuovoItem() {
+    private void modaleNuovoItem() {
         boolean esegui = true;
         do {
             System.out.println();
@@ -311,7 +306,7 @@ public class Archivio {
         } while( esegui );
     }
 
-    public void modaleRimuovi() {
+    private void modaleRimuovi() {
 
         boolean esegui = true;
 
@@ -344,7 +339,7 @@ public class Archivio {
 
     }
 
-    public void modaleRicerca() {
+    private void modaleRicerca() {
         boolean esegui = true;
 
         do {
@@ -435,9 +430,7 @@ public class Archivio {
                         System.out.println( "Visualizzo il catalogo" );
                         getDatabases();
                     }
-                    default -> {
-                        System.out.println("inserisci un input valido!");
-                    }
+                    default -> System.out.println("inserisci un input valido!");
                 }
             } catch( InputMismatchException e ) {
                 System.out.println( "Qualcosa è andato storto! Riprova" );
@@ -446,6 +439,9 @@ public class Archivio {
 
         } while( esegui );
     }
+
+
+    // __________________ UNICO METODO ACCESSIBILE __________ //
 
     public void open() {
         boolean esegui = true;
@@ -485,9 +481,7 @@ public class Archivio {
                         System.out.println("Hai scelto di effettuare una ricerca");
                         modaleRicerca();
                     }
-                    default -> {
-                        System.out.println("Inserisci un input valido");
-                    }
+                    default -> System.out.println("Inserisci un input valido");
                 }
 
             } catch( InputMismatchException e ) {
