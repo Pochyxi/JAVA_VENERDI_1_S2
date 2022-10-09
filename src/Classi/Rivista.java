@@ -13,6 +13,13 @@ public class Rivista extends Catalogo {
 
     }
 
+    public Rivista( String titolo, int annoPubblicazione, int numeroPagine, Periodicita periodicita  ) {
+
+        super( titolo, annoPubblicazione, numeroPagine );
+        this.periodicita = periodicita;
+
+    }
+
     @Override
     public String toString() {
         return "ISBN: " + this.getCodiceISBN()

@@ -16,6 +16,14 @@ public abstract class Catalogo {
         this.setNumeroPagine( numeroPagine );
     }
 
+    public Catalogo(String titolo, int annoPubblicazione, int numeroPagine ){
+        this.titolo = titolo;
+        this.annoPubblicazione = annoPubblicazione;
+        this.numeroPagine = numeroPagine;setTitolo( titolo );
+        this.setAnnoPubblicazione( annoPubblicazione);
+        this.setNumeroPagine( numeroPagine );
+    }
+
 
     // SETTERS
 

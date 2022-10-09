@@ -11,6 +11,11 @@ public class Libro extends Catalogo{
         this.autore = autore;
         this.genere = genere;
     }
+    public Libro (String titolo, int annoPubblicazione, int numeroPagine, String autore, Genere genere) {
+        super(titolo, annoPubblicazione, numeroPagine );
+        this.autore = autore;
+        this.genere = genere;
+    }
 
     @Override
     public String toString() {
